@@ -191,4 +191,4 @@ if __name__ == "__main__":
     print("  - GET /api/controlnet/models")
     print("  - POST /api/upload-controlnet-image")
     print("  - GET /api/images/<filename>")
-    app.run(host='127.0.0.1', port=5001, debug=True) 
+    app.run(host='0.0.0.0', port=5001, debug=True) 

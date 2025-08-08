@@ -82,9 +82,10 @@ if os.environ.get('DREAMLAYER_COMFYUI_CPU_MODE', 'false').lower() == 'true':
     print("Forcing ComfyUI to run in CPU mode as requested.")
     sys.argv.append('--cpu')
 
-# Allow WebSocket connections from frontend
+# Allow WebSocket connections from frontend and bind to all interfaces
 cors_origin = os.environ.get('COMFYUI_CORS_ORIGIN', 'http://localhost:8080')
 sys.argv.extend(['--enable-cors-header', cors_origin])
+sys.argv.extend(['--listen', '0.0.0.0'])
 
 # Only add ComfyUI to path if it exists and we need to start the server
 def import_comfyui_main():
@@ -569,8 +570,14 @@ def get_controlnet_models_endpoint():
 
 if __name__ == "__main__":
     print("Starting Dream Layer backend services...")
-    if start_comfy_server():
+    success = True
+
+    if not os.path.exists("/.dockerenv"):
+        print("Starting Comfy Server")
+        success = start_comfy_server()
+
+    if success:
         start_flask_server()
     else:
         print("Failed to start ComfyUI server. Exiting...")
-        sys.exit(1) 
+        sys.exit(1)
