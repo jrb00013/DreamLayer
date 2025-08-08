@@ -10,8 +10,8 @@ from dream_layer import get_directories
 from dream_layer_backend_utils.update_custom_workflow import find_save_node
 from dream_layer_backend_utils.shared_workflow_parameters import increment_seed_in_workflow
 
-# Global constants
-COMFY_API_URL = "http://127.0.0.1:8188"
+# Global constants - configurable via environment variable
+COMFY_API_URL = os.environ.get("COMFY_API_URL", "http://127.0.0.1:8188")
 SERVED_IMAGES_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'served_images')
 
 # Model display name mapping file
