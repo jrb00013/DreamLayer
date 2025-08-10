@@ -1,7 +1,9 @@
 import json
 import random
 import os
+import logging
 import json
+from pathlib import Path
 from dream_layer_backend_utils.workflow_loader import load_workflow
 from dream_layer_backend_utils.api_key_injector import inject_api_keys_into_workflow
 from dream_layer_backend_utils.update_custom_workflow import override_workflow 
@@ -15,6 +17,29 @@ from dream_layer_backend_utils.shared_workflow_parameters import (
     inject_lora_parameters
 )
 from shared_utils import SAMPLER_NAME_MAP
+
+# Initialize logger
+logger = logging.getLogger(__name__)
+
+def get_default_model_name():
+    """
+    Helper function to dynamically extract the model name 
+    from the checkpoints folder
+    """
+    # Root folder (assumes this script is somewhere inside DreamLayer/dream_layer_backend or similar)
+    root_dir = Path(__file__).resolve().parent.parent.parent  # adjust if needed
+    
+    # Path to checkpoints folder
+    checkpoints_dir = root_dir / "ComfyUI" / "models" / "checkpoints"
+    
+    # Find all .safetensors files in checkpoints
+    available_models = [f.name for f in checkpoints_dir.glob("*.safetensors")]
+    
+    if not available_models:
+        raise FileNotFoundError(f"No model checkpoint files found in {checkpoints_dir}")
+    
+    # Return first available model filename
+    return available_models[0]
 
 def transform_to_txt2img_workflow(data):
     """
@@ -57,9 +82,20 @@ def transform_to_txt2img_workflow(data):
         except (ValueError, TypeError):
             seed = random.randint(0, 2**32 - 1)
         
-        # Handle model name validation
-        model_name = data.get('model_name', 'juggernautXL_v8Rundiffusion.safetensors')
-        
+        # Model name validation
+        requested_model = data.get("model_name")
+    
+        try:
+            default_model_name = get_default_model_name()
+        except FileNotFoundError as e:
+            logger.error(str(e))
+            default_model_name = "fallback_model.safetensor"  # could be changed to juggernautXL_v8Rundiffusion.safetensors
+
+        # Use requested model if valid, else fallback to detected
+        model_name = requested_model if requested_model else default_model_name
+
+        #model_name = data.get('model_name', 'juggernautXL_v8Rundiffusion.safetensors') # was hardcoded
+
         # Check if it's a closed-source model (DALL-E, FLUX, Ideogram, etc.)
         closed_source_models = ['dall-e-3', 'dall-e-2', 'flux-pro', 'flux-dev', 'ideogram-v3']
         

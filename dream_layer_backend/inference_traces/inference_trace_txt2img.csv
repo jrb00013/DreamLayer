@@ -1,0 +1,4 @@
+timestamp,total_time_s,images_generated,time_per_image_s,gpu_name,driver_version,ckpt_name
+1754803186.3610072,301.3461,0,,CPU,N/A,juggernautXL_v8Rundiffusion.safetensors
+1754833175.356676,301.1881,0,,CPU,N/A,juggernautXL_v8Rundiffusion.safetensors
+1754841283.3543549,0.0102,0,,CPU,N/A,juggernautXL_v8Rundiffusion.safetensors

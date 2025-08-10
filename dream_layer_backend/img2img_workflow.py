@@ -18,18 +18,49 @@ import re
 import logging
 from dream_layer import get_directories 
 from extras import COMFY_INPUT_DIR
+from pathlib import Path
 
-
+# Initialize logger
 logger = logging.getLogger(__name__)
 
+def get_default_model_name():
+    """
+    Helper function to dynamically extract the model name 
+    from the checkpoints folder
+    """
+    # Root folder (assumes this script is somewhere inside DreamLayer/dream_layer_backend or similar)
+    root_dir = Path(__file__).resolve().parent.parent.parent  # adjust if needed
+    
+    # Path to checkpoints folder
+    checkpoints_dir = root_dir / "ComfyUI" / "models" / "checkpoints"
+    
+    # Find all .safetensors files in checkpoints
+    available_models = [f.name for f in checkpoints_dir.glob("*.safetensors")]
+    
+    if not available_models:
+        raise FileNotFoundError(f"No model checkpoint files found in {checkpoints_dir}")
+    
+    # Return first available model filename
+    return available_models[0]
 
 def transform_to_img2img_workflow(data):
     """
     Transform frontend request data into ComfyUI workflow format for img2img
     """
 
-    # Determine model type and features
-    model_name = data.get('model_name', 'v1-6-pruned-emaonly-fp16.safetensors')
+    # Dynamically Determine model type and features
+    requested_model = data.get("model_name")
+    
+    try:
+        default_model_name = get_default_model_name()
+    except FileNotFoundError as e:
+        logger.error(str(e))
+        default_model_name = "fallback_model.safetensor"  # could be changed to v1-6-pruned-emaonly-fp16.safetensors
+
+    # Use requested model if valid, else fallback to detected
+    model_name = requested_model if requested_model else default_model_name
+    #model_name = data.get('model_name', 'v1-6-pruned-emaonly-fp16.safetensors') # was hardcoded 
+    
     use_controlnet = bool(data.get('controlnet'))
     use_lora = bool(data.get('lora'))
 
