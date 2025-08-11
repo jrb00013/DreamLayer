@@ -22,43 +22,41 @@ from pathlib import Path
 
 # Initialize logger
 logger = logging.getLogger(__name__)
-
-def get_default_model_name():
-    """
-    Helper function to dynamically extract the model name 
-    from the checkpoints folder
-    """
-    # Root folder (assumes this script is somewhere inside DreamLayer/dream_layer_backend or similar)
-    root_dir = Path(__file__).resolve().parent.parent.parent  # adjust if needed
+def get_available_checkpoints():
+    logger.info(f"Current __file__ path: {__file__}")
+    root_dir = Path(__file__).resolve().parent.parent
+    logger.info(f"Resolved root_dir: {root_dir}")
     
-    # Path to checkpoints folder
     checkpoints_dir = root_dir / "ComfyUI" / "models" / "checkpoints"
+    logger.info(f"Looking for checkpoints in: {checkpoints_dir}")
     
-    # Find all .safetensors files in checkpoints
-    available_models = [f.name for f in checkpoints_dir.glob("*.safetensors")]
+    if not checkpoints_dir.exists():
+        logger.error(f"Checkpoints directory does not exist: {checkpoints_dir}")
+        return []
     
-    if not available_models:
-        raise FileNotFoundError(f"No model checkpoint files found in {checkpoints_dir}")
-    
-    # Return first available model filename
-    return available_models[0]
+    models = [f.name for f in checkpoints_dir.glob("*") if f.suffix in ['.safetensors', '.ckpt']]
+    logger.info(f"Found checkpoint files: {models}")
+    return models
 
 def transform_to_img2img_workflow(data):
     """
     Transform frontend request data into ComfyUI workflow format for img2img
     """
 
-    # Dynamically Determine model type and features
+    # Dynamically determine the model name that's being used and validate
     requested_model = data.get("model_name")
+    available_models = get_available_checkpoints()
+    if not available_models:
+        raise FileNotFoundError("No checkpoint models found in ComfyUI models/checkpoints directory")
     
-    try:
-        default_model_name = get_default_model_name()
-    except FileNotFoundError as e:
-        logger.error(str(e))
-        default_model_name = "fallback_model.safetensor"  # could be changed to v1-6-pruned-emaonly-fp16.safetensors
-
     # Use requested model if valid, else fallback to detected
-    model_name = requested_model if requested_model else default_model_name
+    if requested_model and requested_model in available_models:
+        model_name = requested_model
+    else:
+        # fallback to first available checkpoint and log the fallback
+        model_name = available_models[0]
+        logger.warning(f"Requested model '{requested_model}' not found. Falling back to '{model_name}'.")
+    
     #model_name = data.get('model_name', 'v1-6-pruned-emaonly-fp16.safetensors') # was hardcoded 
     
     use_controlnet = bool(data.get('controlnet'))
@@ -107,7 +105,7 @@ def transform_to_img2img_workflow(data):
     cfg_scale = max(1.0, min(20.0, float(data.get('cfg_scale', 7.0))))
     denoising_strength = max(0.0, min(1.0, float(data.get('denoising_strength', 0.75))))
     input_image = data.get('input_image', '')
-    model_name = data.get('model_name', 'v1-6-pruned-emaonly-fp16.safetensors')
+    #model_name = data.get('model_name', 'v1-6-pruned-emaonly-fp16.safetensors')
     sampler_name = data.get('sampler_name', 'euler')
     scheduler = data.get('scheduler', 'normal')
     

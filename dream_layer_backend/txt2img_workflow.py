@@ -21,25 +21,15 @@ from shared_utils import SAMPLER_NAME_MAP
 # Initialize logger
 logger = logging.getLogger(__name__)
 
-def get_default_model_name():
-    """
-    Helper function to dynamically extract the model name 
-    from the checkpoints folder
-    """
-    # Root folder (assumes this script is somewhere inside DreamLayer/dream_layer_backend or similar)
-    root_dir = Path(__file__).resolve().parent.parent.parent  # adjust if needed
-    
-    # Path to checkpoints folder
-    checkpoints_dir = root_dir / "ComfyUI" / "models" / "checkpoints"
-    
-    # Find all .safetensors files in checkpoints
-    available_models = [f.name for f in checkpoints_dir.glob("*.safetensors")]
-    
-    if not available_models:
-        raise FileNotFoundError(f"No model checkpoint files found in {checkpoints_dir}")
-    
-    # Return first available model filename
-    return available_models[0]
+def get_available_checkpoints():
+    root_dir = Path(__file__).resolve().parent.parent
+    checkpoints_dir = root_dir / "ComfyUI" /  "models" / "checkpoints"
+    try:
+        models = [f.name for f in checkpoints_dir.glob("*") if f.suffix in ['.safetensors', '.ckpt']]
+        return models
+    except Exception as e:
+        logger.error(f"Failed to list checkpoints: {e}")
+        return []
 
 def transform_to_txt2img_workflow(data):
     """
@@ -82,18 +72,20 @@ def transform_to_txt2img_workflow(data):
         except (ValueError, TypeError):
             seed = random.randint(0, 2**32 - 1)
         
-        # Model name validation
+        # Dynamically determine the model name that's being used and validate
         requested_model = data.get("model_name")
-    
-        try:
-            default_model_name = get_default_model_name()
-        except FileNotFoundError as e:
-            logger.error(str(e))
-            default_model_name = "fallback_model.safetensor"  # could be changed to juggernautXL_v8Rundiffusion.safetensors
+        available_models = get_available_checkpoints()
+        if not available_models:
+            raise FileNotFoundError("No checkpoint models found in ComfyUI models/checkpoints directory")  # could be changed to juggernautXL_v8Rundiffusion.safetensors
 
         # Use requested model if valid, else fallback to detected
-        model_name = requested_model if requested_model else default_model_name
-
+        if requested_model and requested_model in available_models:
+                model_name = requested_model
+        else:
+            # fallback to first available checkpoint and log the fallback
+            model_name = available_models[0]
+            logger.warning(f"Requested model '{requested_model}' not found. Falling back to '{model_name}'.")
+        
         #model_name = data.get('model_name', 'juggernautXL_v8Rundiffusion.safetensors') # was hardcoded
 
         # Check if it's a closed-source model (DALL-E, FLUX, Ideogram, etc.)

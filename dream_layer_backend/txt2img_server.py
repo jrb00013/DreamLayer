@@ -105,7 +105,7 @@ def handle_txt2img():
                 print("No ControlNet units found")
 
             # Get the absolute path to the ComfyUI root directory 
-            COMFY_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+            COMFY_ROOT = os.path.dirname(os.path.abspath(__file__))
             
              # Get checkpoint 
             ckpt_name = data.get("ckpt_name", "unknown")
@@ -127,8 +127,13 @@ def handle_txt2img():
             ALLOWED_CKPTS = get_allowed_checkpoints()
 
             # Validate checkpoint 
-            if ckpt_name not in ALLOWED_CKPTS:
-                return jsonify({"error": f"Invalid ckpt_name: {ckpt_name}"}), 400
+            if not ckpt_name or ckpt_name not in ALLOWED_CKPTS:
+                if ALLOWED_CKPTS:
+                    chosen_ckpt = ALLOWED_CKPTS[0]
+                    print(f"Checkpoint '{ckpt_name}' invalid or missing, falling back to '{chosen_ckpt}'")
+                    ckpt_name = chosen_ckpt
+            else:
+                return jsonify({"error": "No checkpoints available on server"}), 500
             
             # Insert ckpt_name into data
             data['ckpt_name'] = ckpt_name
