@@ -246,6 +246,18 @@ def transform_to_img2img_workflow(data):
         logger.info("Injecting Refiner parameters...")
         workflow = inject_refiner_parameters(workflow, refiner_data)
     
+    print(f"✅ Workflow transformation complete")
+     # Ensure dump directory exists
+    dump_dir = os.path.join(os.path.dirname(__file__), "workflow_dumps")
+    os.makedirs(dump_dir, exist_ok=True)
+    
+    # Save the workflow JSON
+    output_path = os.path.join(dump_dir, "last_workflow.json")
+    with open(output_path, "w") as f:
+        json.dump(workflow, f, indent=2)
+
+    print(f"📋 Generated workflow JSON: {json.dumps(workflow, indent=2)}")
+    print(f"🚀 Workflow JSON saved to {output_path}")
     return workflow
 
 def extract_filename_from_data_url(data_url):

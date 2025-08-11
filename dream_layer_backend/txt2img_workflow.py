@@ -241,7 +241,17 @@ def transform_to_txt2img_workflow(data):
             workflow = inject_refiner_parameters(workflow, refiner_data)
         
         print(f"✅ Workflow transformation complete")
-        print(f"📋 Generated workflow: {json.dumps(workflow, indent=2)}")
+        # Ensure dump directory exists
+        dump_dir = os.path.join(os.path.dirname(__file__), "workflow_dumps")
+        os.makedirs(dump_dir, exist_ok=True)
+
+        # Save the workflow JSON
+        output_path = os.path.join(dump_dir, "last_workflow.json")
+        with open(output_path, "w") as f:
+            json.dump(workflow, f, indent=2)
+
+        print(f"📋 Generated workflow JSON: {json.dumps(workflow, indent=2)}")
+        print(f"🚀 Workflow JSON saved to {output_path}")
         return workflow
         
     except Exception as e:
