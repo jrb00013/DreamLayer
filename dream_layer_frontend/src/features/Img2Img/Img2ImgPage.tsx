@@ -40,7 +40,7 @@ const Img2ImgPage: React.FC<Img2ImgPageProps> = ({ selectedModel, onTabChange })
   const [batchSize, setBatchSize] = useState(1);
   const [isLoaded, setIsLoaded] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
-  
+  const [metrics, setMetrics] = React.useState<{ elapsed_time_sec: number; gpu: string } | null>(null);
   // ControlNet configuration will be managed by useControlNetStore
   
   const { 
@@ -167,7 +167,12 @@ const Img2ImgPage: React.FC<Img2ImgPageProps> = ({ selectedModel, onTabChange })
 
       if (data.comfy_response?.generated_images) {
         console.log('Generated images from response:', data.comfy_response.generated_images);
-        
+      
+        // Set metrics from backend if available
+        if (data.comfy_response.metrics) {
+          setMetrics(data.comfy_response.metrics);
+        }
+
         const testImage = new Image();
         const firstImageUrl = data.comfy_response.generated_images[0].url;
         
@@ -194,6 +199,7 @@ const Img2ImgPage: React.FC<Img2ImgPageProps> = ({ selectedModel, onTabChange })
           setIsGenerating(false);
           throw new Error('Failed to load generated image');
         };
+
         
         testImage.src = firstImageUrl;
       } else {
@@ -206,7 +212,9 @@ const Img2ImgPage: React.FC<Img2ImgPageProps> = ({ selectedModel, onTabChange })
       console.error('Error in handleGenerateImage:', error);
       setLoading(false);
       setIsGenerating(false);
+      
     }
+    
   };
 
   const getSectionTitle = () => {

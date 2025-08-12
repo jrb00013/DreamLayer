@@ -41,6 +41,7 @@ const Txt2ImgPage: React.FC<Txt2ImgPageProps> = ({ selectedModel, onTabChange })
   const controlNetConfig = useControlNetStore(state => state.controlNetConfig);
   const { setControlNetConfig } = useControlNetStore();
   const loraConfig = useLoraStore(state => state.loraConfig);
+  const [metrics, setMetrics] = React.useState<{ elapsed_time_sec: number; gpu: string } | null>(null);
 
   // Add effect to update model when selectedModel prop changes
   useEffect(() => {
@@ -214,7 +215,11 @@ const Txt2ImgPage: React.FC<Txt2ImgPageProps> = ({ selectedModel, onTabChange })
         const images = data.comfy_response.generated_images.map((img: any) => {
           // Use the URL directly from the response
           const imageUrl = img.url;
-          
+
+          // Set metrics from backend if available
+          if (data.comfy_response.metrics) {
+              setMetrics(data.comfy_response.metrics);
+            }
           // Create a test image to verify the URL works
           const testImage = new Image();
           testImage.src = imageUrl;

@@ -22,3 +22,10 @@ timestamp,total_time_s,images_generated,time_per_image_s,gpu_name,driver_version
 1754924224.424215,0.0,0,,CPU,N/A,juggernautXL_v8Rundiffusion.safetensors
 1754926591.025748,301.3167,0,,CPU,N/A,juggernautXL_v8Rundiffusion.safetensors
 1754948761.507086,301.2014,0,,CPU,N/A,unknown
+1754953737.084278,301.574,0,,CPU,N/A,unknown
+1755031482.6354072,301.4959,0,,CPU,N/A,juggernautXL_v8Rundiffusion.safetensors
+1755031704.523446,80.554,1,80.554,CPU,N/A,juggernautXL_v8Rundiffusion.safetensors
+1755032728.004299,0.4533,1,0.4533,CPU,N/A,juggernautXL_v8Rundiffusion.safetensors
+1755033409.806452,301.5118,0,,CPU,N/A,juggernautXL_v8Rundiffusion.safetensors
+1755033868.0322208,301.699,0,,CPU,N/A,juggernautXL_v8Rundiffusion.safetensors
+1755039709.030485,301.1955,0,,CPU,N/A,juggernautXL_v8Rundiffusion.safetensors

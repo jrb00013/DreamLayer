@@ -183,11 +183,11 @@ def handle_txt2img():
                     "message": comfy_response["error"]
                 }), 500
             
+            comfy_response["generated_images"] = comfy_response.get("all_images", [])
             response = jsonify({
                 "status": "success",
                 "message": "Workflow sent to ComfyUI successfully",
                 "comfy_response": comfy_response,
-                "generated_images": comfy_response.get("all_images", [])
             })
             
             return response
