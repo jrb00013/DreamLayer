@@ -23,7 +23,7 @@
         ],
         "sampler_name": "euler",
         "scheduler": "normal",
-        "seed": 1475844967,
+        "seed": 53064756,
         "steps": 20
       }
     },
@@ -48,7 +48,7 @@
           "4",
           1
         ],
-        "text": "A random person."
+        "text": "Red fox"
       }
     },
     "7": {

@@ -269,6 +269,24 @@ const Img2ImgPage: React.FC<Img2ImgPageProps> = ({ selectedModel, onTabChange })
     updateCoreSettings({ refiner_switch_at: value });
   };
 
+  const MetricsBadge: React.FC<{
+    elapsedTimeSec: number;
+    gpu: string;
+    driver: string;
+  }> = ({ elapsedTimeSec, gpu, driver }) => {
+    const timePerImage = elapsedTimeSec.toFixed(2);
+    const shortGpu = gpu.length > 12 ? gpu.slice(0, 12) + "…" : gpu;
+  
+    return (
+      <div
+        className="ml-4 px-3 py-1 rounded bg-gray-200 text-gray-800 text-sm font-semibold select-none"
+        title={`GPU: ${gpu} · Driver: ${driver}`} // optional tooltip
+      >
+        {timePerImage} s per image · {shortGpu}
+      </div>
+    );
+  };
+    
   const exportImg2ImgMetricsToCSV = () => {
     if (!metrics) return;
   
@@ -440,7 +458,7 @@ const Img2ImgPage: React.FC<Img2ImgPageProps> = ({ selectedModel, onTabChange })
         <div className="flex flex-col">
           <div className="mb-[18px] flex flex-col space-y-2 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
             <h3 className="text-base font-medium text-foreground">Image to Image Generation</h3>
-            metrics && (
+            {metrics && (
               <>
               <button
                 onClick={exportImg2ImgMetricsToCSV} 
@@ -448,13 +466,13 @@ const Img2ImgPage: React.FC<Img2ImgPageProps> = ({ selectedModel, onTabChange })
               >
                 Download CSV
               </button>
-              <div className="mb-2 text-xs text-gray-600 dark:text-gray-400">
-              {`${metrics.time_per_image_sec?.toFixed(2) ?? 
-                (metrics.elapsed_time_sec / (coreSettings.batch_size * coreSettings.batch_count)).toFixed(2)
-                } s per image · ${metrics.gpu} (Driver ${metrics.driver_version})`}
-            </div>
+              <MetricsBadge
+              elapsedTimeSec={metrics.time_per_image_sec ?? (metrics.elapsed_time_sec / (batchSize * batchCount))}
+              gpu={metrics.gpu}
+              driver={metrics.driver_version}
+            />
             </>
-            )
+            )}
             <div className="flex space-x-2">
               <Button 
                 className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
