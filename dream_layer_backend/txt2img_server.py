@@ -164,15 +164,20 @@ def handle_txt2img():
             # Stop timing
             elapsed = time.perf_counter() - start
 
-            # Determine number of images generated
+            # Determine number of images generated and time per image
             images_generated = len(comfy_response.get("all_images", []))
-
+            time_per_image = None if images_generated == 0 else total_time / images_generated
+    
+            # Converting to string format
+            time_per_image_str = "N/A" if time_per_image is None else f"{time_per_image:.2f}"
+                    
             # Log the result
             log_inference_trace(elapsed, images_generated, gpu_name, driver_version,ckpt_name)
 
             # Add metrics into API response
             comfy_response["metrics"] = {
                 "elapsed_time_sec": elapsed,
+                "time_per_image_sec": time_per_image,
                 "gpu": gpu_name,
                 "driver_version": driver_version
             }

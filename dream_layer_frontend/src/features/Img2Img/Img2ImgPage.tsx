@@ -40,7 +40,13 @@ const Img2ImgPage: React.FC<Img2ImgPageProps> = ({ selectedModel, onTabChange })
   const [batchSize, setBatchSize] = useState(1);
   const [isLoaded, setIsLoaded] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
-  const [metrics, setMetrics] = React.useState<{ elapsed_time_sec: number; gpu: string } | null>(null);
+  const [metrics, setMetrics] = React.useState<{
+    elapsed_time_sec: number;
+    time_per_image_sec: number;
+    gpu: string;
+    driver_version: string;
+  } | null>(null);
+
   // ControlNet configuration will be managed by useControlNetStore
   
   const { 
@@ -263,6 +269,27 @@ const Img2ImgPage: React.FC<Img2ImgPageProps> = ({ selectedModel, onTabChange })
     updateCoreSettings({ refiner_switch_at: value });
   };
 
+  const exportImg2ImgMetricsToCSV = () => {
+    if (!metrics) return;
+  
+    const headers = ['elapsed_time_sec', 'time_per_image_sec', 'gpu', 'driver_version'];
+    const values = [
+      metrics.elapsed_time_sec,
+      metrics.time_per_image_sec,
+      metrics.gpu,
+      metrics.driver_version
+    ];
+  
+    const csv = [headers.join(','), values.join(',')].join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.setAttribute('download', `inference_trace_img2img.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   const renderSubTabContent = () => {
     switch (activeSubTab) {
@@ -413,6 +440,21 @@ const Img2ImgPage: React.FC<Img2ImgPageProps> = ({ selectedModel, onTabChange })
         <div className="flex flex-col">
           <div className="mb-[18px] flex flex-col space-y-2 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
             <h3 className="text-base font-medium text-foreground">Image to Image Generation</h3>
+            metrics && (
+              <>
+              <button
+                onClick={exportImg2ImgMetricsToCSV} 
+                className="rounded-md border border-input bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground"
+              >
+                Download CSV
+              </button>
+              <div className="mb-2 text-xs text-gray-600 dark:text-gray-400">
+              {`${metrics.time_per_image_sec?.toFixed(2) ?? 
+                (metrics.elapsed_time_sec / (coreSettings.batch_size * coreSettings.batch_count)).toFixed(2)
+                } s per image · ${metrics.gpu} (Driver ${metrics.driver_version})`}
+            </div>
+            </>
+            )
             <div className="flex space-x-2">
               <Button 
                 className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
