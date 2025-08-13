@@ -31,3 +31,5 @@ timestamp,total_time_s,images_generated,time_per_image_s,gpu_name,driver_version
 1755039709.030485,301.1955,0,,CPU,N/A,juggernautXL_v8Rundiffusion.safetensors
 1755041998.9101171,300.3344,0,,CPU,N/A,unknown
 1755042012.7522612,301.2818,0,,CPU,N/A,unknown
+1755072753.412419,300.5095,0,,CPU,N/A,unknown
+1755100109.236161,301.1258,0,,CPU,N/A,unknown

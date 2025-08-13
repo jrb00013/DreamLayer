@@ -23,14 +23,14 @@
         ],
         "sampler_name": "euler",
         "scheduler": "normal",
-        "seed": 53064756,
+        "seed": 1220297583,
         "steps": 20
       }
     },
     "4": {
       "class_type": "CheckpointLoaderSimple",
       "inputs": {
-        "ckpt_name": "juggernautXL_v8Rundiffusion.safetensors"
+        "ckpt_name": "Realistic_Vision_V6.0_NV_B1.safetensors"
       }
     },
     "5": {
@@ -48,7 +48,7 @@
           "4",
           1
         ],
-        "text": "Red fox"
+        "text": "red fox"
       }
     },
     "7": {
