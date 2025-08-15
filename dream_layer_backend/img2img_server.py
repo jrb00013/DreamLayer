@@ -16,7 +16,6 @@ from shared_utils import COMFY_API_URL
 from dream_layer_backend_utils.fetch_advanced_models import get_controlnet_models
 from run_registry import create_run_config_from_generation_data
 from dataclasses import asdict
-d
 
 # Configure logging
 logging.basicConfig(

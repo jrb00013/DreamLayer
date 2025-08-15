@@ -33,3 +33,4 @@ timestamp,total_time_s,images_generated,time_per_image_s,gpu_name,driver_version
 1755042012.7522612,301.2818,0,,CPU,N/A,unknown
 1755072753.412419,300.5095,0,,CPU,N/A,unknown
 1755100109.236161,301.1258,0,,CPU,N/A,unknown
+1755275022.702453,301.1851,0,,CPU,N/A,unknown

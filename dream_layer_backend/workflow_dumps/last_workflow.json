@@ -23,7 +23,7 @@
         ],
         "sampler_name": "euler",
         "scheduler": "normal",
-        "seed": 1220297583,
+        "seed": 1022003460,
         "steps": 20
       }
     },
